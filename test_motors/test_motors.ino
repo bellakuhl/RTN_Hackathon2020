@@ -1,9 +1,9 @@
-const int enAPin = 6; // Left motor PWM speed control
-const int in1Pin = 7; // Left motor Direction 1
-const int in2Pin = 5; // Left motor Direction 2
-const int in3Pin = 4; // Right motor Direction 1
-const int in4Pin = 2; // Right motor Direction 2
-const int enBPin = 3; // Right motor PWM speed control
+const int enBPin = 6; // Left motor PWM speed control
+const int in3Pin = 7; // Left motor Direction 1
+const int in4Pin = 5; // Left motor Direction 2
+const int in1Pin = 4; // Right motor Direction 1
+const int in2Pin = 2; // Right motor Direction 2
+const int enAPin = 3; // Right motor PWM speed control
 enum Motor { LEFT, RIGHT };
 
 void setup() {
@@ -32,7 +32,7 @@ void go( enum Motor m, int speed){
 // right motor forward then back
 void testMotors () {
   static int speed[8] = { 128, 255, 128, 0 ,-128, -255, -128, 0};
-  go(RIGHT, 0);
+  
   for (unsigned char i = 0 ; i < 8 ; i++)
     go(LEFT, speed[i ]), delay (200);
   for (unsigned char i = 0 ; i < 8 ; i++)
