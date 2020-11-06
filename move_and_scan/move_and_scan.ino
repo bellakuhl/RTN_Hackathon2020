@@ -1,4 +1,7 @@
-/* program to scan for objects while moving straight */
+/* program to scan for objects while moving straight 
+servo mounted on front of bot scans for objects within certain distance
+When object detected, bot reverses to the right*/
+
 #include <Servo.h>
 Servo servo;
 
