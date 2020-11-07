@@ -6,17 +6,17 @@ When object detected, bot reverses to the right*/
 Servo servo;
 
 // Ultrasonic Module pins
-const int trigPin = 13; // 10 microsecond high pulse causes chirp , wait 50 us
+const int trigPin = 10; // 10 microsecond high pulse causes chirp , wait 50 us //changed from 13
 const int echoPin = 12; // Width of high pulse indicates distance
 // Servo motor that aims ultrasonic sensor .
-const int servoPin = 11; // PWM output for hobby servo
+const int servoPin = 9; // PWM output for hobby servo // changed from 11
 // Motor control pins : L298N H bridge
 const int enBPin = 6; // Left motor PWM speed control
 const int in3Pin = 7; // Left motor Direction 1
 const int in4Pin = 5; // Left motor Direction 2
 const int in1Pin = 4; // Right motor Direction 1
 const int in2Pin = 2; // Right motor Direction 2
-const int enAPin = 3; // Right motor PWM speed control
+const int enAPin = 1; // Right motor PWM speed control //changed from 3
 
 enum Motor { LEFT, RIGHT };
 
@@ -139,31 +139,15 @@ void loop () {
   
   for (unsigned char i = 0 ; i < NUM_ANGLES ; i++) {
     if ( distance[i] < TOO_CLOSE_DIST) {
-      //Serial.println(distance[i]);
-      //avoid(i);
       tooClose = 1; 
       detectedAngle = i; // save index of angle that object is detected at
-      //blink_indicate();
-      //delay(50);
     }
   }
-  //Serial.println(tooClose);
-//  Serial.println(distance[i]);
-  /*if (tooClose) {
-    // Something's nearby: blink and back up left
-    //blink_indicate();
-    go(LEFT, REVERSE_F);
-    go(RIGHT, REVERSE_S);
-  } else {
-    // Nothing in our way: go forward
-    go(LEFT, MAX_L-50); // minus 50 to normal speed
-    go(RIGHT, MAX_R-50);
-  }*/
+Serial.println(distance[0]);
   if (tooClose) {
     avoid(detectedAngle);
   } else {
     // Nothing in our way: go forward
-    Serial.println("check");
     go(LEFT, MAX_L-50); // minus 50 to normal speed
     go(RIGHT, MAX_R-50);
   }
