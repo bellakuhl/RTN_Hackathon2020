@@ -23,8 +23,10 @@ enum Motor { LEFT, RIGHT };
 #define TOO_CLOSE_DIST 100 // object distance thats considered too close (mm)
 
 // compensate for motor differences
-#define MAX_L 255 // max speed compared to max speed of right motor
-#define MAX_R 240 // max speed compared to max speed of left motor
+#define MAX_L 245 // max speed compared to max speed of right motor
+#define MAX_R 230 // max speed compared to max speed of left motor
+#define REVERSE_F -130 // reverse fast
+#define REVERSE_S -90 // reverse slow
 
 // Set motor speed: 255 full ahead, -255 full reverse , 0 stop
 void go( enum Motor m, int speed){
@@ -66,11 +68,26 @@ void readNextDistance () {
     servo.write( sensorAngle[angleIndex ] );
 }
 
+// blick to indicate avoiding obstacle
 void blink_indicate() {
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   delay(200);                       // wait for half a second
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
   delay(200);                       // wait for half a second
+}
+
+// logic to avoid obstacle based on postion
+void avoid(int i) {
+  if (i < 3) { // if obstacle is detected at an angle of 60, 70, or 80
+    go(LEFT, REVERSE_F); // reverse right
+    go(RIGHT, REVERSE_S);
+  } else if (i == 3) { // if obstacle is at 90 degrees (straight ahead)
+    go(LEFT, REVERSE_F); // reverse right (arbitrary choice)
+    go(RIGHT, REVERSE_S);
+  } else {
+    go(LEFT, REVERSE_S); // reverse left
+    go(RIGHT, REVERSE_F);
+  }
 }
 
 // Initial configuration
@@ -118,21 +135,35 @@ void loop () {
   
   // See if something is too close at any angle
   unsigned char tooClose = 0;
+  int detectedAngle = 0;
   
   for (unsigned char i = 0 ; i < NUM_ANGLES ; i++) {
-    if ( distance[i] < TOO_CLOSE_DIST)
-    //Serial.println(distance[i]);
-    tooClose = 1;
+    if ( distance[i] < TOO_CLOSE_DIST) {
+      //Serial.println(distance[i]);
+      //avoid(i);
+      tooClose = 1; 
+      detectedAngle = i; // save index of angle that object is detected at
+      //blink_indicate();
+      //delay(50);
+    }
   }
-  Serial.println(tooClose);
-  //Serial.println(distance[i]);
-  if (tooClose) {
+  //Serial.println(tooClose);
+//  Serial.println(distance[i]);
+  /*if (tooClose) {
     // Something's nearby: blink and back up left
-    blink_indicate();
-    go(LEFT, -120);
-    go(RIGHT, -80);
+    //blink_indicate();
+    go(LEFT, REVERSE_F);
+    go(RIGHT, REVERSE_S);
   } else {
     // Nothing in our way: go forward
+    go(LEFT, MAX_L-50); // minus 50 to normal speed
+    go(RIGHT, MAX_R-50);
+  }*/
+  if (tooClose) {
+    avoid(detectedAngle);
+  } else {
+    // Nothing in our way: go forward
+    Serial.println("check");
     go(LEFT, MAX_L-50); // minus 50 to normal speed
     go(RIGHT, MAX_R-50);
   }
