@@ -28,8 +28,8 @@ enum Motor { LEFT, RIGHT };
 #define TOO_CLOSE_DIST 150 // object distance thats considered too close (mm)
 
 // compensate for motor differences
-#define MAX_L 125 // max speed compared to max speed of right motor
-#define MAX_R 165 // max speed compared to max speed of left motor
+#define MAX_L 128 // max speed compared to max speed of right motor
+#define MAX_R 160 // max speed compared to max speed of left motor
 #define REVERSE_F -80 // reverse fast
 #define REVERSE_S -40 // reverse slow
 
@@ -65,7 +65,7 @@ unsigned int readDistance ()
 }
 
 #define NUM_ANGLES 7
-unsigned char sensorAngle[NUM_ANGLES] = { 60, 70, 80, 90, 100, 110, 120 };
+unsigned char sensorAngle[NUM_ANGLES] = { 30, 70, 80, 90, 100, 110, 150 };
 unsigned int distance [NUM_ANGLES];
 
 // Scan the area ahead by sweeping the ultrasonic sensor left and right
@@ -80,14 +80,6 @@ void readNextDistance () {
   if (angleIndex == NUM_ANGLES - 1) step = -1; // if at max angle, rotate back the other way
   else if (angleIndex == 0) step = 1;
     servo.write( sensorAngle[angleIndex ] );
-}
-
-// blick to indicate avoiding obstacle
-void blink_indicate() {
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(200);                       // wait for half a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(200);                       // wait for half a second
 }
 
 // logic to avoid obstacle based on postion
@@ -120,12 +112,10 @@ void r2d2() {
 void phrase1() {
     
     int k = random(1000,2000);
-    digitalWrite(LED_BUILTIN, HIGH);
     for (int i = 0; i <=  random(100,2000); i++){
         tone(speakerPin, k+(-i*2));          
         delay(random(.9,2));             
     } 
-    digitalWrite(LED_BUILTIN, LOW);   
     for (int i = 0; i <= random(100,1000); i++){
         tone(speakerPin, k + (i * 10));          
         delay(random(.9,2));             
@@ -135,12 +125,10 @@ void phrase1() {
 void phrase2() {
     
     int k = random(1000,2000);
-    digitalWrite(LED_BUILTIN, HIGH);  
     for (int i = 0; i <= random(100,2000); i++){
         tone(speakerPin, k+(i*2));          
         delay(random(.9,2));             
     } 
-    digitalWrite(LED_BUILTIN, LOW);   
     for (int i = 0; i <= random(100,1000); i++){
         tone(speakerPin, k + (-i * 10));          
         delay(random(.9,2));             
@@ -160,7 +148,6 @@ void setup () {
   pinMode(in3Pin, OUTPUT);
   pinMode(in4Pin, OUTPUT);
   pinMode(enBPin, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(speakerPin, OUTPUT);
 
   // random seed for r2d2 sounds
@@ -203,6 +190,7 @@ void setup () {
 // If anything appears to be too close , back up
 // Otherwise, go forward
 //
+bool avoided = 0;
 void loop () {
   // print smiley face
   myDisplay.print(":D");
@@ -216,18 +204,25 @@ void loop () {
   for (unsigned char i = 0 ; i < NUM_ANGLES ; i++) {
     if ( distance[i] < TOO_CLOSE_DIST) {
       tooClose = 1; 
-      r2d2(); // play r2d2 sound
       detectedAngle = i; // save index of angle that object is detected at
-      break;
+      //i = NUM_ANGLES;
     }
+    //Serial.println(i);
   }
-  
-  if (tooClose) {
+  for (int i = 0; i < 7; i++) {
+    Serial.print(distance[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+  if (tooClose == 1 && avoided == 0) {
     avoid(detectedAngle);
+    avoided = 1;
+    r2d2(); // play r2d2 sound
   } else {
     // Nothing in our way: go forward
-    go(LEFT, MAX_L-50); // minus 50 to normal speed
-    go(RIGHT, MAX_R-50);
+    go(LEFT, MAX_L);
+    go(RIGHT, MAX_R);
+    avoided = 0;
   }
   // Check the next direction in 50 ms
   delay (50);
