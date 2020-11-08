@@ -25,13 +25,13 @@ const int enAPin = 1; // Right motor PWM speed control //changed from 3
 
 enum Motor { LEFT, RIGHT };
 
-#define TOO_CLOSE_DIST 100 // object distance thats considered too close (mm)
+#define TOO_CLOSE_DIST 150 // object distance thats considered too close (mm)
 
 // compensate for motor differences
-#define MAX_L 245 // max speed compared to max speed of right motor
-#define MAX_R 230 // max speed compared to max speed of left motor
-#define REVERSE_F -130 // reverse fast
-#define REVERSE_S -90 // reverse slow
+#define MAX_L 145 // max speed compared to max speed of right motor
+#define MAX_R 185 // max speed compared to max speed of left motor
+#define REVERSE_F -90 // reverse fast
+#define REVERSE_S -50 // reverse slow
 
 // Define hardware type, size, and output pins:
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW

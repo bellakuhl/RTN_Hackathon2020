@@ -1,3 +1,5 @@
+// program that turns motos forward and backwards to test orientation
+
 const int enBPin = 6; // Left motor PWM speed control
 const int in3Pin = 7; // Left motor Direction 1
 const int in4Pin = 5; // Left motor Direction 2
