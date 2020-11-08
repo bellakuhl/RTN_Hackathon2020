@@ -1,8 +1,13 @@
 /* program to scan for objects while moving straight 
 servo mounted on front of bot scans for objects within certain distance
-When object detected, bot reverses to the right*/
+When object detected, bot reverses to the right
+Also included Dot Matrix with scrolling text*/
 
 #include <Servo.h>
+#include <MD_Parola.h>
+#include <MD_MAX72xx.h>
+#include <SPI.h>
+
 Servo servo;
 
 // Ultrasonic Module pins
@@ -27,6 +32,14 @@ enum Motor { LEFT, RIGHT };
 #define MAX_R 230 // max speed compared to max speed of left motor
 #define REVERSE_F -130 // reverse fast
 #define REVERSE_S -90 // reverse slow
+
+// Define hardware type, size, and output pins:
+#define HARDWARE_TYPE MD_MAX72XX::FC16_HW
+#define MAX_DEVICES 1 //number of matrix leds used
+#define CS_PIN 3
+
+// Create a new instance of the MD_Parola class with hardware SPI connection:
+MD_Parola myDisplay = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 
 // Set motor speed: 255 full ahead, -255 full reverse , 0 stop
 void go( enum Motor m, int speed){
@@ -106,6 +119,21 @@ void setup () {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
 
+  // Intialize the object:
+  myDisplay.begin();
+  // Set the intensity (brightness) of the display (0-15):
+  myDisplay.setIntensity(0);
+  // Clear the display:
+  myDisplay.displayClear();
+  myDisplay.displayText("Go!", PA_CENTER, 100, 0, PA_SCROLL_LEFT, PA_SCROLL_LEFT);
+  
+  // display text (scrolling finishes after the amount of time required to count to 25000)
+  for (int i = 0; i < 25000; i++) {
+    if (myDisplay.displayAnimate()) {
+      myDisplay.displayReset();
+    }
+  }
+  
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
 
@@ -129,7 +157,8 @@ void setup () {
 // Otherwise, go forward
 //
 void loop () {
-  
+  // print smiley face
+  myDisplay.print(":D");
   // Get the next sensor reading
   readNextDistance ();
   
@@ -143,7 +172,7 @@ void loop () {
       detectedAngle = i; // save index of angle that object is detected at
     }
   }
-Serial.println(distance[0]);
+//Serial.println(distance[0]);
   if (tooClose) {
     avoid(detectedAngle);
   } else {
